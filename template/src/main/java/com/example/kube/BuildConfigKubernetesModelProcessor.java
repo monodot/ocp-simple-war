@@ -32,7 +32,7 @@ public class BuildConfigKubernetesModelProcessor {
                 .endEnv()
                 .withNewFrom()
                 .withKind("ImageStreamTag")
-                .withName("fis-java-openshift:latest")
+                .withName("webserver30-tomcat8-appdynamics:latest")
                 .withNamespace("openshift")
                 .endFrom()
                 .endSourceStrategy()
@@ -51,7 +51,7 @@ public class BuildConfigKubernetesModelProcessor {
 
     private BuildTriggerPolicy getTriggers() {
         ObjectReference from = new ObjectReference();
-        from.setName("fis-java-openshift:latest");
+        from.setName("webserver30-tomcat8-appdynamics:latest");
         from.setKind("ImageStreamTag");
         from.setNamespace("openshift");
 

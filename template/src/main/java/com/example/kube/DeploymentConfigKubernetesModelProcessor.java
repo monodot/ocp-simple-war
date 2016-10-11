@@ -112,12 +112,29 @@ public class DeploymentConfigKubernetesModelProcessor {
         container.setImagePullPolicy("Always");
         container.setName(ConfigParameters.APP_NAME);
         container.setPorts(getPorts());
+        container.setEnv(getEnv());
 //        container.setLivenessProbe(getProbe());
 //        container.setReadinessProbe(getProbe());
         container.setVolumeMounts(getVolumeMounts());
         return container;
     }
 
+    private List<EnvVar> getEnv(){
+        return new ImmutableList.Builder<EnvVar>()
+                .add(new EnvVar("APPDYNAMICS_CONTROLLER_HOST_NAME", "${APPDYNAMICS_CONTROLLER_HOST_NAME}", null))
+                .add(new EnvVar("APPDYNAMICS_AGENT_ACCOUNT_NAME", "${APPDYNAMICS_AGENT_ACCOUNT_NAME}", null))
+                .add(new EnvVar("APPDYNAMICS_CONTROLLER_PORT", "${APPDYNAMICS_CONTROLLER_PORT}", null))
+                .add(new EnvVar("APPDYNAMICS_CONTROLLER_SSL_ENABLED", "${APPDYNAMICS_CONTROLLER_SSL_ENABLED}", null))
+                .add(new EnvVar("APPDYNAMICS_AGENT_ACCOUNT_NAME", "${APPDYNAMICS_AGENT_ACCOUNT_NAME}", null))
+                .add(new EnvVar("APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY", "${APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY}", null))
+                .add(new EnvVar("APPDYNAMICS_AGENT_APPLICATION_NAME", "${APPDYNAMICS_AGENT_APPLICATION_NAME}", null))
+                .add(new EnvVar("APPDYNAMICS_AGENT_TIER_NAME", "${APPDYNAMICS_AGENT_TIER_NAME}",
+                        new EnvVarSource(null,new ObjectFieldSelector(null, "metadata.namespace"), null)))
+                .add(new EnvVar("APPDYNAMICS_AGENT_NODE_NAME", "${APPDYNAMICS_AGENT_NODE_NAME}",
+                        new EnvVarSource(null,new ObjectFieldSelector(null, "metadata.name"), null)))
+                .build();
+
+    }
 
     private List<Volume> getVolumes(){
 

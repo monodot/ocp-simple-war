@@ -9,7 +9,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>kube-generator</module>
+    <module>template</module>
     <module>app</module>
   </modules>
 </project>
