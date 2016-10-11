@@ -1,0 +1,9 @@
+#!/bin/bash
+set -eo pipefail
+
+if [ x"$APPDYNAMICS_AGENT_ACCOUNT_NAME" != "x" ]; then
+    mkdir /deployments/logs
+    export JAVA_OPTIONS="-javaagent:/deployments/appdynamics/javaagent.jar -Dappdynamics.agent.logs.dir=/deployments/logs $JAVA_OPTIONS"
+fi
+
+exec /usr/local/s2i/run
