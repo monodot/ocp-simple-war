@@ -19,6 +19,8 @@ thing.objects.each() {
     }
 }
 
+def buildParams = ['REGISTRY','IS_PULL_NAMESPACE', 'IS_TAG', 'GIT_URI']
+
 buildTemplate.objects = buildObjects
 deployTemplate.objects = deployObjects
 
