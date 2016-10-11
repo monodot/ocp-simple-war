@@ -1,15 +1,15 @@
 import groovy.json.*
 
 def jsonText = new File("${project.build.directory}/classes/kubernetes.json").text
-def thing = new JsonSlurper().parseText(jsonText)
+def kubeMap = new JsonSlurper().parseText(jsonText)
 
 def buildObjects = []
 def deployObjects = []
 
-def buildTemplate = thing.getClass().newInstance(thing)
-def deployTemplate = thing.getClass().newInstance(thing)
+def buildTemplate = kubeMap.getClass().newInstance(kubeMap)
+def deployTemplate = kubeMap.getClass().newInstance(kubeMap)
 
-thing.objects.each() {
+kubeMap.objects.each() {
 
     if(it.kind == 'BuildConfig' || it.kind == 'ImageStream'){
         buildObjects.add(it)
@@ -20,12 +20,16 @@ thing.objects.each() {
 }
 
 def buildParams = ['REGISTRY','IS_PULL_NAMESPACE', 'IS_TAG', 'GIT_URI']
+def removeFromDeployParams = ['GIT_URI']
 
 buildTemplate.objects = buildObjects
 deployTemplate.objects = deployObjects
 
-buildTemplate.metadata.name = "$templateName"
-deployTemplate.metadata.name = "$templateName"
+def buildParamList = kubeMap.parameters.findAll{ buildParams.contains(it.name) == true }
+def deployParamList = kubeMap.parameters.findAll{ removeFromDeployParams.contains(it.name) != true }
+
+buildTemplate.parameters = buildParamList
+deployTemplate.parameters = deployParamList
 
 def buildTemplateFile = new File("${project.build.directory}/classes/kubernetes-build.json")
 buildTemplateFile << JsonOutput.prettyPrint(JsonOutput.toJson(buildTemplate))

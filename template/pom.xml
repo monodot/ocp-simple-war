@@ -21,6 +21,8 @@
         <fabric8.parameter.APPDYNAMICS_AGENT_ACCOUNT_NAME>RedHat71</fabric8.parameter.APPDYNAMICS_AGENT_ACCOUNT_NAME>
         <fabric8.parameter.APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY>tmb9xrzt68lg</fabric8.parameter.APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY>
         <fabric8.parameter.APPDYNAMICS_AGENT_APPLICATION_NAME>ocp-simple-war-app</fabric8.parameter.APPDYNAMICS_AGENT_APPLICATION_NAME>
+        <fabric8.parameter.HOSTNAME_HTTP>ocp-simple-war-app</fabric8.parameter.HOSTNAME_HTTP>
+        <fabric8.parameter.HOSTNAME_HTTPS>ocp-simple-war-app</fabric8.parameter.HOSTNAME_HTTPS>
     </properties>
     <dependencies>
         <!--these dependencies are only used for KubeDSL generation-->

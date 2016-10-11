@@ -91,9 +91,14 @@ public class DeploymentConfigKubernetesModelProcessor {
         List<ContainerPort> ports = new ArrayList<ContainerPort>();
 
         ContainerPort http = new ContainerPort();
-        http.setContainerPort(8181);
+        http.setContainerPort(8080);
         http.setProtocol("TCP");
         http.setName("http");
+
+        ContainerPort https = new ContainerPort();
+        https.setContainerPort(8443);
+        https.setProtocol("TCP");
+        https.setName("https");
 
         ContainerPort jolokia = new ContainerPort();
         jolokia.setContainerPort(8778);
@@ -101,6 +106,7 @@ public class DeploymentConfigKubernetesModelProcessor {
         jolokia.setName("jolokia");
 
         ports.add(http);
+        ports.add(https);
         ports.add(jolokia);
 
         return ports;
