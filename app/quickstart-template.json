@@ -195,7 +195,7 @@
             "from": {
               "kind": "ImageStreamTag",
               "namespace": "${IMAGE_STREAM_NAMESPACE}",
-              "name": "fis-java-openshift:${BUILDER_VERSION}"
+              "name": "webserver30-tomcat8-appdynamics:${BUILDER_VERSION}"
             },
             "forcePull": true,
             "env": [
