@@ -119,8 +119,9 @@ public class DeploymentConfigKubernetesModelProcessor {
         container.setName(ConfigParameters.APP_NAME);
         container.setPorts(getPorts());
         container.setEnv(getEnv());
+        container.setResources(getResourceRequirements());
 //        container.setLivenessProbe(getProbe());
-//        container.setReadinessProbe(getProbe());
+        container.setReadinessProbe(getReadinessProbe());
         container.setVolumeMounts(getVolumeMounts());
         return container;
     }
@@ -172,15 +173,52 @@ public class DeploymentConfigKubernetesModelProcessor {
         return selectors;
     }
 
-//    private Probe getProbe() {
-//        TCPSocketAction ldapAction = new TCPSocketAction();
-//        ldapAction.setPort(new IntOrString(389));
-//
-//        Probe probe = new Probe();
-//        probe.setInitialDelaySeconds(new Integer(15));
-//        probe.setTimeoutSeconds(new Integer(5));
-//        probe.setTcpSocket(ldapAction);
-//
-//        return probe;
-//    }
+    private Probe getProbe() {
+        TCPSocketAction ldapAction = new TCPSocketAction();
+        ldapAction.setPort(new IntOrString(389));
+
+        Probe probe = new Probe();
+        probe.setInitialDelaySeconds(new Integer(15));
+        probe.setTimeoutSeconds(new Integer(5));
+        probe.setTcpSocket(ldapAction);
+
+        return probe;
+    }
+
+
+    private Probe getReadinessProbe() {
+        Probe readyProbe = new Probe();
+        List<String> execCommands = new ImmutableList.Builder<String>()
+                .add("/bin/bash")
+                .add("-c")
+                .add("curl -s -u ${JWS_ADMIN_USERNAME}:${JWS_ADMIN_PASSWORD} 'http://localhost:8080/manager/jmxproxy/?get=Catalina%3Atype%3DServer&att=stateName' |grep -iq 'stateName *= *STARTED'").build();
+        readyProbe.setExec(new ExecAction(execCommands));
+        readyProbe.setTimeoutSeconds(10);
+        return readyProbe;
+
+    }
+
+    private ResourceRequirements getResourceRequirements() {
+        ResourceRequirements resourceRequirements = new ResourceRequirements();
+        resourceRequirements.setRequests(getRequests());
+        resourceRequirements.setLimits(getLimits());
+
+        return resourceRequirements;
+    }
+
+    private Map<String, Quantity> getRequests() {
+        Map<String, Quantity> limits = new HashMap<String, Quantity>();
+        limits.put("cpu", new Quantity("200m"));
+        limits.put("memory", new Quantity("512Mi"));
+
+        return limits;
+    }
+
+    private Map<String, Quantity> getLimits() {
+        Map<String, Quantity> limits = new HashMap<String, Quantity>();
+        limits.put("cpu", new Quantity("400m"));
+        limits.put("memory", new Quantity("1024Mi"));
+
+        return limits;
+    }
 }
