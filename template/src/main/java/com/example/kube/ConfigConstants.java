@@ -7,15 +7,19 @@ import java.util.Map;
 /**
  * Created by swinchester on 17/05/2016.
  */
-public class ConfigParameters {
+public class ConfigConstants {
 
 
     public static final String APP_NAME = "ocp-simple-war";
+    public static final String APP_VERSION = "1.0.0-SNAPSHOT";
     public static final String GROUP_NAME = "com.example";
 
     public static final String CONFIGMAP_MOUNT_DIR = "/etc/configmap/";
     public static final String CONFIGMAP_NAME = "example-configmap";
 
+    public static final String IS_PULL_NAME = "webserver30-tomcat8-appdynamics";
+    public static final String IS_PULL_TAG = "latest";
+    public static final String IS_PULL_NS = "build";
 
     public static final String SECRET_MOUNT_DIR = "/etc/secret/";
     public static final String SECRET_NAME = "example-secret";
@@ -24,7 +28,7 @@ public class ConfigParameters {
 
     public static Map<String, String> getLabels() {
         return ImmutableMap.<String, String> builder()
-                .put("application", ConfigParameters.APP_NAME)
+                .put("application", ConfigConstants.APP_NAME)
                 .build();
     }
 }
