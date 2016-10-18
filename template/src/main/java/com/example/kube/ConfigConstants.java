@@ -21,10 +21,18 @@ public class ConfigConstants {
     public static final String IS_PULL_TAG = "latest";
     public static final String IS_PULL_NS = "build";
 
-    public static final String SECRET_MOUNT_DIR = "/etc/secret/";
-    public static final String SECRET_NAME = "example-secret";
+    public static final String SECRET_VOLUME_MOUNT_PATH = "/etc/jws-secret-volume";
+    public static final String SECRET_NAME = "jws-app-secret";
+    public static final String SECRET_VOLUME_MOUNT_NAME = "jws-certificate-volume";
 
     public static final String SERVICE_ACCOUNT_NAME = "jws-service-account";
+
+    public static final int JWS_HTTP_PORT = 8080;
+    public static final int JWS_HTTPS_PORT = 8443;
+    public static final int MYSQL_PORT = 3306;
+    public static final int JOLOKIA_PORT = 8778;
+
+    public static final String PROTOCOL_TCP = "TCP";
 
     public static Map<String, String> getLabels() {
         return ImmutableMap.<String, String> builder()

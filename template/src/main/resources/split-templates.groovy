@@ -19,8 +19,8 @@ kubeMap.objects.each() {
     }
 }
 
-def buildParams = ['REGISTRY','IS_PULL_NAMESPACE', 'IS_TAG', 'GIT_URI']
-def removeFromDeployParams = ['GIT_URI']
+def buildParams = ['REGISTRY','IS_PULL_NAMESPACE', 'IS_TAG', 'GIT_URI', 'SOURCE_REPOSITORY_REF', 'CONTEXT_DIR']
+def removeFromDeployParams = ['GIT_URI', 'SOURCE_REPOSITORY_REF']
 
 buildTemplate.objects = buildObjects
 deployTemplate.objects = deployObjects

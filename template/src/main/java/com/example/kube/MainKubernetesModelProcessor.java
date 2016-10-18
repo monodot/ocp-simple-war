@@ -16,5 +16,6 @@ public class MainKubernetesModelProcessor {
         new ServiceAccountKubernetesProcessor().onTemplate(builder);
         new ServiceKubernetesModelProcessor().on(builder);
         new RouteKubernetesModelProcessor().on(builder);
+
     }
 }

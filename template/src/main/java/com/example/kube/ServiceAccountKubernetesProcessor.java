@@ -9,7 +9,7 @@ public class ServiceAccountKubernetesProcessor {
 
     public void onTemplate(TemplateBuilder builder) {
         builder.addNewServiceAccountObject()
-                .withNewMetadata().withName(ConfigParameters.SERVICE_ACCOUNT_NAME).endMetadata()
+                .withNewMetadata().withName(ConfigConstants.SERVICE_ACCOUNT_NAME).endMetadata()
                 .endServiceAccountObject().build();
     }
 }

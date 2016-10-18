@@ -1,11 +1,10 @@
 package com.example.kube;
 
-import io.fabric8.kubernetes.api.model.ObjectReference;
-import io.fabric8.openshift.api.model.BuildTriggerPolicy;
-import io.fabric8.openshift.api.model.ImageChangeTrigger;
-import io.fabric8.openshift.api.model.TemplateBuilder;
+import io.fabric8.openshift.api.model.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BuildConfigKubernetesModelProcessor {
@@ -13,63 +12,83 @@ public class BuildConfigKubernetesModelProcessor {
     public void on(TemplateBuilder builder) {
         builder.addNewBuildConfigObject()
                 .withNewMetadata()
-                .withName(ConfigParameters.APP_NAME + "-bc")
-                .withLabels(getLabels())
+                    .withName(ConfigConstants.APP_NAME + "-bc")
+                    .withLabels(getLabels())
                 .endMetadata()
                 .withNewSpec()
-                .withTriggers(getTriggers())
-                .withNewSource()
-                .withNewGit()
-                .withUri("${GIT_URI}")
-                .endGit()
-                .withType("Git")
-                .endSource()
-                .withNewStrategy()
-                .withNewSourceStrategy()
-                .addNewEnv()
-                .withName("ARTIFACT_DIR")
-                .withValue("app/target")
-                .endEnv()
-                .withNewFrom()
-                .withKind("ImageStreamTag")
-                .withName("webserver30-tomcat8-appdynamics:latest")
-                .withNamespace("openshift")
-                .endFrom()
-                .endSourceStrategy()
-                .withType("Source")
-                .endStrategy()
-                .withNewOutput()
-                .withNewTo()
-                .withKind("ImageStreamTag")
-                .withName(ConfigParameters.APP_NAME + ":${IS_TAG}")
-                .endTo()
-                .endOutput()
+                    .withTriggers(getTriggers())
+                    .withNewSource()
+                        .withNewGit()
+                            .withUri("${GIT_URI}")
+                            .withRef("${SOURCE_REPOSITORY_REF}")
+                        .endGit()
+                        .withType("Git")
+                        .withContextDir("${CONTEXT_DIR}")
+                    .endSource()
+                    .withNewStrategy()
+                        .withNewSourceStrategy()
+                            .withForcePull(true)
+                            .addNewEnv()
+                                .withName("CONTEXT_DIR")
+                                .withValue("${CONTEXT_DIR}")
+                            .endEnv()
+                            .withNewFrom()
+                                .withKind("ImageStreamTag")
+                                .withName(ConfigConstants.IS_PULL_NAME + ":" + ConfigConstants.IS_PULL_TAG)
+                                .withNamespace(ConfigConstants.IS_PULL_NS)
+                            .endFrom()
+                        .endSourceStrategy()
+                        .withType("Source")
+                    .endStrategy()
+                    .withNewOutput()
+                        .withNewTo()
+                            .withKind("ImageStreamTag")
+                            .withName(ConfigConstants.APP_NAME + ":${IS_TAG}")
+                        .endTo()
+                    .endOutput()
                 .endSpec()
-                .endBuildConfigObject()
-                .build();
+            .endBuildConfigObject()
+            .build();
     }
 
-    private BuildTriggerPolicy getTriggers() {
-        ObjectReference from = new ObjectReference();
-        from.setName("webserver30-tomcat8-appdynamics:latest");
-        from.setKind("ImageStreamTag");
-        from.setNamespace("openshift");
+    private List<BuildTriggerPolicy> getTriggers() {
 
-        ImageChangeTrigger imageChangeTrigger = new ImageChangeTrigger();
-        imageChangeTrigger.setFrom(from);
+        List<BuildTriggerPolicy> p = new ArrayList<BuildTriggerPolicy>();
 
-        BuildTriggerPolicy policy = new BuildTriggerPolicy();
-        policy.setType("ImageChange");
+        p.add(new BuildTriggerPolicyBuilder()
+                .withType("GitHub")
+                .withNewGithub()
+                    .withSecret("${GITHUB_WEBHOOK_SECRET}")
+                .endGithub()
+                .build());
 
-        return policy;
+        p.add(new BuildTriggerPolicyBuilder()
+                .withType("Generic")
+                .withNewGeneric()
+                    .withSecret("${GENERIC_WEBHOOK_SECRET}")
+                .endGeneric()
+                .build());
+
+        p.add(new BuildTriggerPolicyBuilder()
+                .withType("ImageChange")
+                .withNewImageChange()
+                .endImageChange()
+                .build());
+
+        p.add(new BuildTriggerPolicyBuilder()
+                .withType("ConfigChange")
+                .build());
+
+
+        return p;
     }
 
     private Map<String, String> getLabels() {
         Map<String, String> labels = new HashMap<String,String>();
-        labels.put("app", ConfigParameters.APP_NAME);
-        labels.put("project", ConfigParameters.APP_NAME);
-        labels.put("version", "1.0.0-SNAPSHOT");
-        labels.put("group", ConfigParameters.GROUP_NAME);
+        labels.put("app", ConfigConstants.APP_NAME);
+        labels.put("project", ConfigConstants.APP_NAME);
+        labels.put("version", ConfigConstants.APP_VERSION);
+        labels.put("group", ConfigConstants.GROUP_NAME);
 
         return labels;
     }
