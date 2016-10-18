@@ -13,7 +13,7 @@ public class BuildConfigKubernetesModelProcessor {
     public void on(TemplateBuilder builder) {
         builder.addNewBuildConfigObject()
                 .withNewMetadata()
-                .withName(ConfigParameters.APP_NAME + "-bc")
+                .withName(ConfigConstants.APP_NAME + "-bc")
                 .withLabels(getLabels())
                 .endMetadata()
                 .withNewSpec()
@@ -41,7 +41,7 @@ public class BuildConfigKubernetesModelProcessor {
                 .withNewOutput()
                 .withNewTo()
                 .withKind("ImageStreamTag")
-                .withName(ConfigParameters.APP_NAME + ":${IS_TAG}")
+                .withName(ConfigConstants.APP_NAME + ":${IS_TAG}")
                 .endTo()
                 .endOutput()
                 .endSpec()
@@ -66,10 +66,10 @@ public class BuildConfigKubernetesModelProcessor {
 
     private Map<String, String> getLabels() {
         Map<String, String> labels = new HashMap<String,String>();
-        labels.put("app", ConfigParameters.APP_NAME);
-        labels.put("project", ConfigParameters.APP_NAME);
+        labels.put("app", ConfigConstants.APP_NAME);
+        labels.put("project", ConfigConstants.APP_NAME);
         labels.put("version", "1.0.0-SNAPSHOT");
-        labels.put("group", ConfigParameters.GROUP_NAME);
+        labels.put("group", ConfigConstants.GROUP_NAME);
 
         return labels;
     }

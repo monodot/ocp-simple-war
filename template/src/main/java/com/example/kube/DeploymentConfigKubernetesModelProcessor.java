@@ -38,7 +38,7 @@ public class DeploymentConfigKubernetesModelProcessor {
     public void on(TemplateBuilder builder) {
         builder.addNewDeploymentConfigObject()
                 .withNewMetadata()
-                .withName(ConfigParameters.APP_NAME)
+                .withName(ConfigConstants.APP_NAME)
                 .endMetadata()
                 .withNewSpec()
                 .withReplicas(1)
@@ -67,7 +67,7 @@ public class DeploymentConfigKubernetesModelProcessor {
         configChange.setType("ConfigChange");
 
         ObjectReference from = new ObjectReference();
-        from.setName(ConfigParameters.APP_NAME + ":${IS_TAG}");
+        from.setName(ConfigConstants.APP_NAME + ":${IS_TAG}");
         from.setKind("ImageStreamTag");
         from.setNamespace("${IS_PULL_NAMESPACE}");
 
@@ -78,7 +78,7 @@ public class DeploymentConfigKubernetesModelProcessor {
         DeploymentTriggerPolicy imageChange = new DeploymentTriggerPolicy();
         imageChange.setType("ImageChange");
         imageChange.setImageChangeParams(imageChangeParms);
-        imageChangeParms.setContainerNames(Lists.newArrayList(ConfigParameters.APP_NAME));
+        imageChangeParms.setContainerNames(Lists.newArrayList(ConfigConstants.APP_NAME));
 
         List<DeploymentTriggerPolicy> triggers = new ArrayList<DeploymentTriggerPolicy>();
         triggers.add(configChange);
@@ -114,9 +114,9 @@ public class DeploymentConfigKubernetesModelProcessor {
 
     private Container getContainers() {
         Container container = new Container();
-        container.setImage("${IS_PULL_NAMESPACE}/" + ConfigParameters.APP_NAME + ":${IS_TAG}");
+        container.setImage("${IS_PULL_NAMESPACE}/" + ConfigConstants.APP_NAME + ":${IS_TAG}");
         container.setImagePullPolicy("Always");
-        container.setName(ConfigParameters.APP_NAME);
+        container.setName(ConfigConstants.APP_NAME);
         container.setPorts(getPorts());
         container.setEnv(getEnv());
         container.setResources(getResourceRequirements());
@@ -146,12 +146,12 @@ public class DeploymentConfigKubernetesModelProcessor {
     private List<Volume> getVolumes(){
 
         Volume certSecrets = new Volume();
-        certSecrets.setSecret(new SecretVolumeSource(ConfigParameters.SECRET_NAME));
-        certSecrets.setName(ConfigParameters.SECRET_NAME);
+        certSecrets.setSecret(new SecretVolumeSource(ConfigConstants.SECRET_NAME));
+        certSecrets.setName(ConfigConstants.SECRET_NAME);
 
         Volume configMap = new Volume();
-        configMap.setConfigMap(new ConfigMapVolumeSource(null, ConfigParameters.CONFIGMAP_NAME));
-        configMap.setName(ConfigParameters.CONFIGMAP_NAME);
+        configMap.setConfigMap(new ConfigMapVolumeSource(null, ConfigConstants.CONFIGMAP_NAME));
+        configMap.setName(ConfigConstants.CONFIGMAP_NAME);
 
         return new ImmutableList.Builder<Volume>().add(certSecrets).add(configMap).build();
     }
@@ -159,16 +159,16 @@ public class DeploymentConfigKubernetesModelProcessor {
 
     private List<VolumeMount> getVolumeMounts(){
         return new ImmutableList.Builder<VolumeMount>()
-                .add(new VolumeMount(ConfigParameters.SECRET_MOUNT_DIR,ConfigParameters.SECRET_NAME,true))
-                .add(new VolumeMount(ConfigParameters.CONFIGMAP_MOUNT_DIR,ConfigParameters.CONFIGMAP_NAME,true))
+                .add(new VolumeMount(ConfigConstants.SECRET_MOUNT_DIR,ConfigConstants.SECRET_NAME,true))
+                .add(new VolumeMount(ConfigConstants.CONFIGMAP_MOUNT_DIR,ConfigConstants.CONFIGMAP_NAME,true))
                 .build();
 
     }
 
     private Map<String, String> getSelectors() {
         Map<String, String> selectors = new HashMap<>();
-        selectors.put("app", ConfigParameters.APP_NAME);
-        selectors.put("deploymentconfig", ConfigParameters.APP_NAME);
+        selectors.put("app", ConfigConstants.APP_NAME);
+        selectors.put("deploymentconfig", ConfigConstants.APP_NAME);
 
         return selectors;
     }

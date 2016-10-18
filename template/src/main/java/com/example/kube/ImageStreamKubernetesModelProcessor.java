@@ -15,11 +15,11 @@ public class ImageStreamKubernetesModelProcessor {
     public void on(ImageStreamBuilder builder) {
         builder.withSpec(builder.getSpec())
                 .withNewMetadata()
-                    .withName(ConfigParameters.APP_NAME)
+                    .withName(ConfigConstants.APP_NAME)
                 .endMetadata()
                 .withNewSpec()
                     .withTags(getTags())
-                    .withDockerImageRepository("${REGISTRY}/${IS_PULL_NAMESPACE}/" + ConfigParameters.APP_NAME)
+                    .withDockerImageRepository("${REGISTRY}/${IS_PULL_NAMESPACE}/" + ConfigConstants.APP_NAME)
                 .endSpec()
             .build();
     }
@@ -27,11 +27,11 @@ public class ImageStreamKubernetesModelProcessor {
     public void on(TemplateBuilder builder) {
         builder.addNewImageStreamObject()
                 .withNewMetadata()
-                .withName(ConfigParameters.APP_NAME)
+                .withName(ConfigConstants.APP_NAME)
                 .endMetadata()
                 .withNewSpec()
                 .withTags(getTags())
-                .withDockerImageRepository("${REGISTRY}/${IS_PULL_NAMESPACE}/" + ConfigParameters.APP_NAME)
+                .withDockerImageRepository("${REGISTRY}/${IS_PULL_NAMESPACE}/" + ConfigConstants.APP_NAME)
                 .endSpec()
                 .endImageStreamObject()
                 .build();
@@ -40,7 +40,7 @@ public class ImageStreamKubernetesModelProcessor {
 
     private List<TagReference> getTags() {
         ObjectReference fromLatest = new ObjectReference();
-        fromLatest.setName(ConfigParameters.APP_NAME);
+        fromLatest.setName(ConfigConstants.APP_NAME);
         fromLatest.setKind("ImageStreamTag");
 
         Map<String, String> latestAnnotations = new HashMap<String, String>();

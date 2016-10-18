@@ -14,8 +14,8 @@ public class ServiceKubernetesModelProcessor {
     public void on(TemplateBuilder builder) {
 
         builder.addNewServiceObject()
-                .withNewMetadata().withName(ConfigParameters.APP_NAME)
-                .withLabels(ConfigParameters.getLabels())
+                .withNewMetadata().withName(ConfigConstants.APP_NAME)
+                .withLabels(ConfigConstants.getLabels())
                 .endMetadata()
                 .withNewSpec()
                 .withPorts(new ImmutableList.Builder<ServicePort>()
@@ -24,8 +24,8 @@ public class ServiceKubernetesModelProcessor {
                 .endSpec()
                 .endServiceObject()
                 .addNewServiceObject()
-                .withNewMetadata().withName("secure-" + ConfigParameters.APP_NAME)
-                .withLabels(ConfigParameters.getLabels())
+                .withNewMetadata().withName("secure-" + ConfigConstants.APP_NAME)
+                .withLabels(ConfigConstants.getLabels())
                 .endMetadata()
                 .withNewSpec()
                 .withPorts(new ImmutableList.Builder<ServicePort>()
@@ -40,7 +40,7 @@ public class ServiceKubernetesModelProcessor {
 
     public static Map<String, String> getSelector() {
         return ImmutableMap.<String, String> builder()
-                .put("deploymentConfig", ConfigParameters.APP_NAME)
+                .put("deploymentConfig", ConfigConstants.APP_NAME)
                 .build();
     }
 }
