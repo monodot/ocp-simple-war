@@ -1,0 +1,99 @@
+#!/bin/sh
+. /usr/local/s2i/common.sh
+
+# Source code provided to S2I is at ${HOME}/source
+LOCAL_SOURCE_DIR=${HOME}/source
+mkdir -p $LOCAL_SOURCE_DIR
+
+DEPLOY_DIR=$JWS_HOME/webapps
+SRC_SCRIPTS=/tmp/src/.s2i/scripts
+TOMCAT_XML=/tmp/src/.s2i/configuration
+
+
+# the subdirectory within LOCAL_SOURCE_DIR from where we should copy build artifacts
+ARTIFACT_DIR=${ARTIFACT_DIR:-target}
+
+# Copy the source for compilation
+cp -ad /tmp/src/* $LOCAL_SOURCE_DIR
+
+if [ -d $LOCAL_SOURCE_DIR/configuration ]; then
+  echo "Copying config files from project..."
+
+  if [ -f $LOCAL_SOURCE_DIR/configuration/settings.xml ]; then
+    mkdir -p $HOME/.m2
+    mv $LOCAL_SOURCE_DIR/configuration/settings.xml $HOME/.m2
+  fi
+
+  cp -v $LOCAL_SOURCE_DIR/configuration/* $JWS_HOME/conf/
+fi
+
+# copy over our config files
+if [ -d $TOMCAT_XML ]; then
+  echo "Copying xml to the conf dir"
+  cp -v $TOMCAT_XML/*.xml /opt/webserver/conf/
+fi
+
+# copy over our new launch script
+if [ -d $SRC_SCRIPTS ]; then
+  echo "Copying executable scripts to launch area"
+  cp -v $SRC_SCRIPTS/launch.sh /opt/webserver/bin/
+fi
+
+
+configure_proxy
+configure_mirrors
+
+manage_incremental_build
+
+
+#switch here to curl a war file into the build, revert to normal maven build otherwise...
+
+if [ x"$ARTIFACT_URL" != "x" ]; then
+    echo "grabbing the artifact $ARTIFACT_URL"
+    curl -o ${DEPLOY_DIR}/ROOT.war -O ${ARTIFACT_URL}
+else
+    # If a pom.xml is present, this is a normal build scenario
+    # so run maven.
+    if [ -f "$LOCAL_SOURCE_DIR/pom.xml" ]; then
+      pushd $LOCAL_SOURCE_DIR &> /dev/null
+
+      MAVEN_ARGS=${MAVEN_ARGS--e -Popenshift -DskipTests -Dcom.redhat.xpaas.repo.redhatga package}
+
+      # Always force IPv4 (CLOUD-188)
+      # Append user-supplied arguments (CLOUD-412)
+      MAVEN_ARGS="$MAVEN_ARGS -Djava.net.preferIPv4Stack=true ${MAVEN_ARGS_APPEND}"
+
+      echo "Found pom.xml... attempting to build with 'mvn ${MAVEN_ARGS}'"
+
+      echo "Using $(mvn --version)"
+
+      # Execute the actual build
+      mvn $MAVEN_ARGS
+
+      ERR=$?
+      if [ $ERR -ne 0 ]; then
+        echo "Aborting due to error code $ERR from Maven build"
+        exit $ERR
+      fi
+
+      # Copy built artifacts (if any!) from the target/ directory
+      # to the $DEPLOY_DIR directory for later deployment
+      copy_artifacts "$ARTIFACT_DIR" war
+
+      # optionally clear the local maven repository after the build
+      clear_maven_repository
+
+      popd &> /dev/null
+    fi
+
+    # Copy (probably binary) artifacts from the deployments/
+    # directory to the $DEPLOY_DIR directory for later deployment
+    copy_artifacts "deployments" war
+
+fi
+
+
+if [ -d $LOCAL_SOURCE_DIR/lib ]; then
+  echo "Copying libs from project..."
+  cp -v $LOCAL_SOURCE_DIR/lib/* $JWS_HOME/lib/
+fi
