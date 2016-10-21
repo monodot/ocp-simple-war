@@ -81,13 +81,13 @@ public class ServiceKubernetesModelProcessor {
 
     public static Map<String, String> getSelector() {
         return ImmutableMap.<String, String> builder()
-                .put("deploymentConfig", ConfigConstants.APP_NAME)
+                .put("deploymentconfig", ConfigConstants.APP_NAME)
                 .build();
     }
 
     public static Map<String, String> getSelectorDb() {
         return ImmutableMap.<String, String> builder()
-                .put("deploymentConfig", ConfigConstants.APP_NAME + "-mysql")
+                .put("deploymentconfig", ConfigConstants.APP_NAME + "-mysql")
                 .build();
     }
 }

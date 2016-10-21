@@ -19,7 +19,6 @@ public class ImageStreamKubernetesModelProcessor {
                 .endMetadata()
                 .withNewSpec()
                     .withTags(getTags())
-                    .withDockerImageRepository("${REGISTRY}/${IS_PULL_NAMESPACE}/" + ConfigConstants.APP_NAME)
                 .endSpec()
             .build();
     }
@@ -31,7 +30,6 @@ public class ImageStreamKubernetesModelProcessor {
                 .endMetadata()
                 .withNewSpec()
                 .withTags(getTags())
-                .withDockerImageRepository("${REGISTRY}/${IS_PULL_NAMESPACE}/" + ConfigConstants.APP_NAME)
                 .endSpec()
                 .endImageStreamObject()
                 .build();

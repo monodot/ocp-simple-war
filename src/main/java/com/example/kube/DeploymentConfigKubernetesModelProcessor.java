@@ -333,22 +333,22 @@ public class DeploymentConfigKubernetesModelProcessor {
 
     private Map<String, String> getSelectorsDb() {
         Map<String, String> selectors = new HashMap<>();
-        selectors.put("deploymentConfig", "${APPLICATION_NAME}-mysql");
+        selectors.put("deploymentconfig", "${APPLICATION_NAME}-mysql");
 
         return selectors;
     }
 
-    private Probe getProbe() {
-        TCPSocketAction ldapAction = new TCPSocketAction();
-        ldapAction.setPort(new IntOrString(389));
-
-        Probe probe = new Probe();
-        probe.setInitialDelaySeconds(new Integer(15));
-        probe.setTimeoutSeconds(new Integer(5));
-        probe.setTcpSocket(ldapAction);
-
-        return probe;
-    }
+//    private Probe getProbe() {
+//        TCPSocketAction ldapAction = new TCPSocketAction();
+//        ldapAction.setPort(new IntOrString(389));
+//
+//        Probe probe = new Probe();
+//        probe.setInitialDelaySeconds(new Integer(15));
+//        probe.setTimeoutSeconds(new Integer(5));
+//        probe.setTcpSocket(ldapAction);
+//
+//        return probe;
+//    }
 
 
     private Probe getReadinessProbe() {
@@ -390,7 +390,7 @@ public class DeploymentConfigKubernetesModelProcessor {
     private Map<String, String> getLabelsTemplate() {
         Map<String, String> labels = new HashMap<String,String>();
         labels.put("application", "${APPLICATION_NAME}");
-        labels.put("deploymentConfig", "${APPLICATION_NAME}");
+        labels.put("deploymentconfig", "${APPLICATION_NAME}");
 
         return labels;
     }
@@ -398,7 +398,7 @@ public class DeploymentConfigKubernetesModelProcessor {
     private Map<String, String> getLabelsTemplateDb() {
         Map<String, String> labels = new HashMap<String,String>();
         labels.put("application", "${APPLICATION_NAME}");
-        labels.put("deploymentConfig", "${APPLICATION_NAME}-mysql");
+        labels.put("deploymentconfig", "${APPLICATION_NAME}-mysql");
 
         return labels;
     }
