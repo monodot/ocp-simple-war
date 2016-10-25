@@ -134,7 +134,7 @@ function inject_datasources() {
         validationQuery="SELECT 1 from dual"
       fi
 
-      datasources="$datasources$(generate_datasource $jndi $username $password $driver $url $validationQuery)\n\n"
+      datasources="$datasources$(generate_datasource $jndi $username $password $driver $url "$validationQuery")\n\n"
     fi
   done
 
@@ -222,7 +222,7 @@ inject_environmentvariables(){
       contextvars+="<Environment name=\"$actualVarName\" value=\"$actualVarValue\" type=\"$actualVarType\" />"
   done
 
-  if [ x"${contextvars}" != "x" ]; then
+  if [ -n "$jndiVars"  ]; then
     sed -i "s|<!-- ##ENVIRONMENT## -->|$contextvars|" $JWS_HOME/conf/context.xml
   fi
 }
