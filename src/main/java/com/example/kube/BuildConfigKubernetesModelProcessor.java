@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BuildConfigKubernetesModelProcessor {
+    public class BuildConfigKubernetesModelProcessor {
 
     public void on(TemplateBuilder builder) {
         builder.addNewBuildConfigObject()
@@ -24,6 +24,9 @@ public class BuildConfigKubernetesModelProcessor {
                         .endGit()
                         .withType("Git")
                         .withContextDir("${CONTEXT_DIR}")
+                        .withNewSourceSecret()
+                            .withName("${SOURCE_SECRET}")
+                        .endSourceSecret()
                     .endSource()
                     .withNewStrategy()
                         .withNewSourceStrategy()

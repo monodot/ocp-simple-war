@@ -8,8 +8,9 @@
 # $3 - datasource password
 # $4 - datasource driver
 # $5 - datasource url
+# $6 - validation query - i.e. SELECT 1
 function generate_datasource() {
-  ds="    <Resource name=\"$1\" auth=\"Container\" type=\"javax.sql.DataSource\" username=\"$2\" password=\"$3\" driverClassName=\"$4\" url=\"$5\" maxWait=\"10000\" maxIdle=\"30\" validationQuery=\"SELECT 1\" testWhenIdle=\"true\" testOnBorrow=\"true\" factory=\"org.apache.tomcat.jdbc.pool.DataSourceFactory\""
+  ds="    <Resource name=\"$1\" auth=\"Container\" type=\"javax.sql.DataSource\" username=\"$2\" password=\"$3\" driverClassName=\"$4\" url=\"$5\" maxWait=\"10000\" maxIdle=\"30\" validationQuery=\"$6\" testWhenIdle=\"true\" testOnBorrow=\"true\" factory=\"org.apache.tomcat.jdbc.pool.DataSourceFactory\""
   if [ -n "$tx_isolation" ]; then
     ds="$ds defaultTransactionIsolation=\"$tx_isolation\""
   fi
@@ -60,7 +61,7 @@ function inject_datasources() {
     host=$(find_env "${service}_SERVICE_HOST")
     port=$(find_env "${service}_SERVICE_PORT")
 
-    if [ "$db" = "MYSQL" ] || [ "$db" = "POSTGRESQL" ]; then
+    if [ "$db" = "MYSQL" ] || [ "$db" = "POSTGRESQL" ] || [ "$db" = "ORACLE" ] ; then
       configurable_db=true
     else
       configurable_db=false
@@ -117,15 +118,23 @@ function inject_datasources() {
       # max pool size environment variable name format: [NAME]_[DATABASE_TYPE]_MAX_POOL_SIZE
       max_pool_size=$(find_env "${prefix}_MAX_POOL_SIZE")
 
+      #default the url and validationQuery
       url="jdbc:${db,,}://$(find_env "${service}_SERVICE_HOST"):$(find_env "${service}_SERVICE_PORT")/$database"
+
+      validationQuery="SELECT 1"
 
       if [ "$db" = "MYSQL" ]; then
         driver="com.mysql.jdbc.Driver"
       elif [ "$db" = "POSTGRESQL" ]; then
         driver="org.postgresql.Driver"
+      elif [ "$db" = "ORACLE" ]; then
+        # Oracle things are different - but it is OK to be different, right? jdbc:oracle:thin:@127.0.0.1:1521:mysid
+        driver="oracle.jdbc.OracleDriver"
+        url="jdbc:${db,,}:thin:@$(find_env "${service}_SERVICE_HOST"):$(find_env "${service}_SERVICE_PORT"):$database"
+        validationQuery="SELECT 1 from dual"
       fi
 
-      datasources="$datasources$(generate_datasource $jndi $username $password $driver $url)\n\n"
+      datasources="$datasources$(generate_datasource $jndi $username $password $driver $url $validationQuery)\n\n"
     fi
   done
 
@@ -213,7 +222,9 @@ inject_environmentvariables(){
       contextvars+="<Environment name=\"$actualVarName\" value=\"$actualVarValue\" type=\"$actualVarType\" />"
   done
 
-  sed -i "s|<!-- ##ENVIRONMENT## -->|$contextvars|" $JWS_HOME/conf/context.xml
+  if [ x"${contextvars}" != "x" ]; then
+    sed -i "s|<!-- ##ENVIRONMENT## -->|$contextvars|" $JWS_HOME/conf/context.xml
+  fi
 }
 
 inject_datasources
